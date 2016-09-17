@@ -6,7 +6,7 @@
 var PersistenceService = {
     customImport: true,
     logErrors: false,
-    enableCompression: false,
+    enableCompression: true,
     master: '__master__',
     storage: localStorage
 };
@@ -210,12 +210,17 @@ function PersistenceServiceToken(model, inst) {
 PersistenceService._findAllObjs = function(key) {
     var res = [];
     var all = [];
+
     try {
         all = JSON.parse(PersistenceService.storage[key]);
     } catch(err) { /*Ignore*/ }
 
     for (var i in all) {
-        res.push({ id: i, data: all[i] });
+        if (PersistenceService.enableCompression) {
+            res.push({ id: i, data: JSON.parse(LZString.decompress(all[i])) });
+        } else {
+            res.push({ id: i, data: JSON.parse(all[i]) });
+        }
     }
     return res;
 };
@@ -260,9 +265,9 @@ PersistenceService._save = function(key, inst) {
             }
         }
     } else {
-        data = JSON.stringify(inst);
+        data = inst;
     }
-    //Save the data.
+    //Fetch the existing data.
     var table;
     try {
         table = JSON.parse(PersistenceService.storage[key]);
@@ -278,7 +283,14 @@ PersistenceService._save = function(key, inst) {
         id = indecies[0] ? parseInt(indecies[0]) + 1 : 0;
         inst.__id = id;
     }
-    table[id] = data;
+
+    //Compress?
+    if (PersistenceService.enableCompression) {
+        table[id] = LZString.compress(JSON.stringify(data));
+    } else {
+        table[id] = JSON.stringify(data);
+    }
+    //Persist
     try {
         PersistenceService.storage[key] = JSON.stringify(table);
     } catch(err) {
