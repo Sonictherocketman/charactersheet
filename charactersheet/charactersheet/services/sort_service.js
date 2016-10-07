@@ -24,12 +24,12 @@ var SortService = {
             var asc = sort.direction === 'asc' ? true : false;
             var res = null;
 
-            var aprop = a[sort.field]();
-            var bprop = b[sort.field]();
+            var aprop = ko.utils.unwrapObservable(a[sort.field]);
+            var bprop = ko.utils.unwrapObservable(b[sort.field]);
 
             if (sort.numeric) {
-                aprop = parseInt(a[sort.field]());
-                bprop = parseInt(b[sort.field]());
+                aprop = parseInt(ko.utils.unwrapObservable(a[sort.field]));
+                bprop = parseInt(ko.utils.unwrapObservable(b[sort.field]));
             }
 
             if (asc && sort.booleanType) {

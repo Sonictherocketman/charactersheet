@@ -21,6 +21,8 @@ function CharacterRootViewModel() {
     self.inventoryTabViewModel     = ko.observable(new InventoryTabViewModel());
     self.notesTabViewModel         = ko.observable(new NotesTabViewModel());
 
+    self.explorerTabViewModel = ko.observable(new ExplorerTabViewModel());
+
     //Tooltips
     self.profileTooltip = ko.observable('Profile');
     self.statsTooltip = ko.observable('Stats');
@@ -29,6 +31,7 @@ function CharacterRootViewModel() {
     self.weaponsAndArmorTooltip = ko.observable('Weapons and Armor');
     self.backpackTooltip = ko.observable('Backpack');
     self.notesTooltip = ko.observable('Notes');
+    self.explorerTooltip = ko.observable('Explorer');
 
     //Tab Properties
     self.profileTabStatus = ko.pureComputed(function() {
@@ -52,6 +55,9 @@ function CharacterRootViewModel() {
     self.notesTabStatus = ko.pureComputed(function() {
         return self._tabIsVisible('notes');
     });
+    self.explorerTabStatus = ko.pureComputed(function() {
+        return self._tabIsVisible('explorer');
+    });
 
     self.activateProfileTab = function() {
         self.activeTab('profile');
@@ -73,6 +79,9 @@ function CharacterRootViewModel() {
     };
     self.activateNotesTab = function() {
         self.activeTab('notes');
+    };
+    self.activateExplorerTab = function() {
+        self.activeTab('explorer');
     };
     self.toggleWell = function() {
         Notifications.actionsToolbar.toggle.dispatch();
@@ -144,7 +153,8 @@ function CharacterRootViewModel() {
         HotkeysService.registerHotkey('5', self.activateInventoryTab);
         HotkeysService.registerHotkey('6', self.activateNotesTab);
         HotkeysService.registerHotkey('7', self.activateProfileTab);
-        HotkeysService.registerHotkey('8', self.toggleWell);
+        HotkeysService.registerHotkey('8', self.activateExplorerTab);
+        HotkeysService.registerHotkey('9', self.toggleWell);
     };
 
     /**
@@ -152,7 +162,6 @@ function CharacterRootViewModel() {
      */
     self.load = function() {
         self.activeTab(self.playerType().defaultTab);
-
         ViewModelUtilities.loadSubViewModels(self);
     };
 

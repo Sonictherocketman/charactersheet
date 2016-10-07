@@ -104,6 +104,12 @@ var Notifications = {
         allRemoved: new signals.Signal()
     },
 
+    dataRepository: {
+        spells: {
+            changed: new signals.Signal()
+        }
+    },
+
     playerImage: {
         changed: new signals.Signal()
     },
