@@ -10,6 +10,9 @@ var init = function(viewModel) {
     Settings.srdDataRepositoryLocations.forEach(function(location, idx, _) {
         $.getJSON(location.url, function(data) {
             DataRepository[location.key] = data;
+            if (Notifications.dataRepository[location.key]) {
+                Notifications.dataRepository[location.key].changed.dispatch();
+            }
         });
     });
 

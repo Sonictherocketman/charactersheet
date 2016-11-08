@@ -75,6 +75,7 @@ function SpellExplorerViewModel() {
     /* Private Methods */
 
     self._dataHasChanged = function() {
+        if (!DataRepository.spells) { return; }
         var spells = Object.keys(DataRepository.spells).map(function(name, idx, _) {
             return DataRepository.spells[name];
         });
