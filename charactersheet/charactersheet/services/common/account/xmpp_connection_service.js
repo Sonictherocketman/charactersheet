@@ -6,7 +6,7 @@
  * custom configurations.
  */
 var XMPPServiceDefaultConfig = {
-    url: 'http://chat.adventurerscodex.com:5280/http-bind/',
+    url: 'ws://chat.adventurerscodex.com:5280/websocket/',
 
     connection: {
         // Specify a custom callback here.
@@ -92,6 +92,7 @@ function _XMPPService(config) {
         var credentials = self.configuration.credentialsHelper();
         var callback = self.configuration.connection.callback || self._connectionHandler;
         self.connection.connect(credentials.jid, credentials.password, callback);
+        self.connection.flush();
     };
 
     self._connectionHandler = function(status, error) {
@@ -112,6 +113,7 @@ function _XMPPService(config) {
             // Send initial presence.
             // https://xmpp.org/rfcs/rfc3921.html#presence
             self.connection.send($pres().tree());
+            self.connection.flush();
 
             Notifications.xmpp.connected.dispatch();
         } else if (status === Strophe.Status.DISCONNECTED) {
