@@ -11,9 +11,10 @@
 var Utility = {
     markdown: {},
     string: {},
-    array: {}
+    array: {},
+    oauth: {},
+    jid: {}
 };
-
 
 /* Markdown */
 
@@ -61,4 +62,43 @@ Utility.array.updateElement = function(array, updatedElement, elementId) {
             element.importValues(updatedElement.exportValues());
         }
     });
+};
+
+/* OAuth Request Shortcuts */
+
+/**
+ * Using the first Access Token in the local data store, set the
+ * headers for an OAuth request.
+ */
+Utility.oauth.setXHRBearerHeader = function(xhr) {
+    var key = CharacterManager.activeCharacter().key();
+    var token = PersistenceService.findAll(AuthenticationToken)[0];
+    if (!token) {
+        throw Error('No token available for OAuth Requests.');
+    }
+    xhr.setRequestHeader('Authorization', 'Bearer ' + token.accessToken());
+};
+
+/**
+ * Mimics $.getJSON, but includes OAuth Headers.
+ */
+Utility.oauth.getJSON = function(url, onsuccess, onerror) {
+    $.ajax({
+        url: url,
+        type: 'GET',
+        dataType: 'json',
+        success: onsuccess,
+        error: onerror,
+        beforeSend: Utility.oauth.setXHRBearerHeader
+    });
+};
+
+
+/* JID Methods */
+
+/**
+ * Remove characters from string that are not usable in an JID username.
+ */
+Utility.jid.sanitize = function(text) {
+    return (text || '').replace(/[@"&'\/:<> ]/gm, '_');
 };
