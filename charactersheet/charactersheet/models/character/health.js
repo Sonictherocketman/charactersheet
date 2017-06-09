@@ -40,7 +40,8 @@ function Health() {
     //Progress bar methods.
 
     self.hitpointsText = ko.pureComputed(function() {
-        return 'HP: ' + self.hitpoints().toString();
+        return 'HP: ' + self.hitpoints().toString()
+            + ' / ' + self.totalHitpoints().toString();
     });
 
     self.isKnockedOut =  ko.pureComputed(function() {

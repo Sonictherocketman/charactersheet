@@ -1,8 +1,8 @@
 <div class="panel panel-default bio">
   <div class="panel-body">
 	<!--Health items -->
-    <div class="row row-padded">
-      <div class="col-md-12 col-padded stats-health-border">
+    <div class="row">
+      <div class="col-md-12 stats-health-border">
         <div class="progress clickable" data-toggle="modal" data-bind="click: editHealth">
           <div id="regularHitPoints" class="progress-bar" role="progressbar" aria-valuemin="0"
             data-bind="style: { width: health().regularProgressWidth }, css: health().progressType,
@@ -17,38 +17,28 @@
             id="hitpointsCounter" data-bind="text: health().hitpointsText">
           </div>
         </div>
-        <table class="table table-responsive table-ac-bordered table-hover">
-          <thead data-toggle="modal" data-bind="click: editHealth" class="clickable">
-            <tr>
-              <th class="col-md-2"></th>
-              <th class="text-center col-md-2">Max</th>
-              <th class="text-center col-md-5">Damage</th>
-              <th class="text-center col-md-3">Reset</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td class="col-content-vertical clickable"
-                data-toggle="modal" data-bind="click: editHealth">
-                <b>Hit Points:</b>
-              </td>
-              <td class="col-content-vertical text-center clickable"
-               data-toggle="modal" data-bind="click: editHealth">
-                  <span data-bind="text: health().maxHitpoints"></span>
-              </td>
-              <td>
-                <plus-minus params="value: health().damage,
-                  max: health().totalHitpoints">
-                  </plus-minus>
-              </td>
-              <td class="text-center col-content-vertical">
-                <a data-bind="click: resetDamage" href="#">
-                  <i class="fa fa-refresh fa-color"> </i>
-                </a>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-xs-6 col-sm-5 col-sm-offset-1 text-center">
+        <b>Damage</b><br />
+      </div>
+      <div class="col-xs-5 text-center">
+        <b data-bind="click: resetDamage"  class="clickable">Reset</b><br />
+      </div>
+    </div>
+    <div class="row row-padded">
+      <div class="col-xs-6 col-sm-5 col-sm-offset-1 text-center">
+        <plus-minus params="value: health().damage,
+          max: health().totalHitpoints, allowsBulkEditing: true">
+          </plus-minus>
+      </div>
+      <div class="col-xs-5 text-center" style="line-height:2.8em;>
+        <a href="#">
+          <i class="fa fa-2x fa-refresh fa-color"> </i>
+        </a>
+      </div>
+    </div>
         <div class="input-group">
           <span class="input-group-addon">Hit Dice:</span>
           <div class="form-control hit-dice-list">
