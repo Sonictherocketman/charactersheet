@@ -1,3 +1,4 @@
+import { ChatServiceManager } from 'charactersheet/services/common/account/messaging/chat_service';
 import ko from 'knockout';
 
 export function ChatCellViewModel(chat) {
@@ -8,7 +9,6 @@ export function ChatCellViewModel(chat) {
     self._name = chat.name;
     self.badge = ko.observable();
     self.isGroupChat = chat.isGroupChat;
-    self._getRoomMembers = chat.getRoomMembers;
     self.isParty = chat.isParty;
     self.members = ko.observableArray([]);
 
@@ -26,7 +26,8 @@ export function ChatCellViewModel(chat) {
     });
 
     self.reload = function() {
-        self.members(self._getRoomMembers());
+        var chatService = ChatServiceManager.sharedService();
+        self.members(chatService.getPCardsOrNamesForRoomOccupants(self.id()));
     };
 
     /* View Model Methods */

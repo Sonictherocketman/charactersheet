@@ -13,7 +13,11 @@ import { Message } from 'charactersheet/models/common/message';
 import { PersistenceService } from 'charactersheet/services/common/persistence_service';
 import { Presence } from 'charactersheet/models/common/presence';
 import { SharedServiceManager } from '../../shared_service_manager';
-import { XMPPService } from 'charactersheet/services/common/account/xmpp_connection_service';
+import {
+    CharacterCardPublishingService,
+    DMCardPublishingService
+} from '../../sync/card_service';
+import { XMPPService } from '../xmpp_connection_service';
 import ko from 'knockout';
 import uuid from 'node-uuid';
 
@@ -154,6 +158,58 @@ function _ChatService(config) {
         return Object.keys(self.rooms);
     };
 
+    self.getPCardsOrNamesForRoomOccupants = function(jid) {
+        var character = CharacterManager.activeCharacter();
+        var chatService = ChatServiceManager.sharedService();
+        var occupants = chatService.getOccupantsInRoom(jid);
+
+        // Get the current card service.
+        var cardService = null;
+        if (character.playerType().key == 'character') {
+            cardService = CharacterCardPublishingService.sharedService();
+        } else {
+            cardService = DMCardPublishingService.sharedService();
+        }
+
+        var occupantCardsOrNames = occupants.map(function(occupant, idx, _) {
+            return cardService.pCards[occupant] ? cardService.pCards[occupant] : occupant;
+        });
+
+        return occupantCardsOrNames;
+    };
+
+
+    // Presence Party/Room Methods
+
+    self.presenceRegardsCurrentParty = function(presence) {
+        return presence.fromBare() === Strophe.getBareJidFromJid(self.currentPartyNode);
+    };
+
+    self.presenceRegardsActiveRoom = function(presence) {
+        // We've joined a room, but there are no active rooms set yet.
+        var rooms = self.getAllRooms();
+        if (rooms.length === 0) {
+            return true;
+        }
+        return rooms.some(function(jid, idx, _) {
+            return presence.fromBare() === Strophe.getBareJidFromJid(jid);
+        });
+    };
+
+    self.presenceRegardsJoiningRoom = function(presence) {
+        return self.presenceRegardsActiveRoom(presence) && (
+            presence.hasParticipantRole() || presence.hasModeratorRole()
+        );
+    };
+
+    self.presenceRegardsLeavingRoom = function(presence) {
+        return presence.hasNoneRole();
+    };
+
+    self.presenceRegardsLeavingParty = function(presence) {
+        return presence.hasNoneRole() && self.presenceRegardsCurrentParty(presence);
+    };
+
     /* Private Methods */
 
     // Message Handlers
@@ -218,7 +274,7 @@ function _ChatService(config) {
             // Handle Joining and leaving a room.
             if (presence.hasError()) {
                 Notifications.party.joined.dispatch(presence.fromBare(), false);
-            } else if (presence.regardsJoiningRoom()) {
+            } else if (self.presenceRegardsJoiningRoom(presence)) {
                 if (presence.fromUsername() == myNick) {
                     // We've joined.
                     Notifications.party.joined.dispatch(presence.fromBare(), true);
@@ -226,8 +282,8 @@ function _ChatService(config) {
                     // Someone else has joined.
                     Notifications.chat.member.joined.dispatch(presence);
                 }
-            } else if (presence.regardsLeavingRoom()) {
-                if (presence.fromUsername() == myNick && presence.regardsLeavingParty()) {
+            } else if (self.presenceRegardsLeavingRoom(presence)) {
+                if (presence.fromUsername() == myNick && self.presenceRegardsLeavingParty(presence)) {
                     // We've left.
                     Notifications.party.left.dispatch(presence.fromBare(), true);
                 } else {

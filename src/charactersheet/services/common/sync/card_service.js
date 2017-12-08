@@ -113,7 +113,7 @@ function _pCardService(configuration) {
     /* Event Handlers */
 
     self._updateCurrentNode = function(roomName, success) {
-        if (success) {
+        if (success && (roomName !== self.currentPartyNode)) {
             self.currentPartyNode = roomName;
             self.dataHasChanged();
         }

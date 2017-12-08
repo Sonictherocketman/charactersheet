@@ -3,6 +3,7 @@ import {
     PersistenceService,
     XMPPService
 } from 'charactersheet/services/common';
+import { ChatServiceManager } from 'charactersheet/services/common/account/messaging/chat_service';
 import {
     CharacterManager,
     Notifications
@@ -21,7 +22,6 @@ export function ChatDetailViewModel(params) {
     self.room = params.room;
     self.members = params.room().members;
     self.isGroupChat = params.room().isGroupChat;
-    self._getRoomMembers = params.room()._getRoomMembers;
     self.badgeHandler = params.badgeHandler;
     self.wasAtBottom = ko.observable(true);
 
@@ -73,7 +73,9 @@ export function ChatDetailViewModel(params) {
     self.reloadData = function() {
         var chat = PersistenceService.findFirstBy(ChatRoom, 'chatId', self.id());
         if (!chat) { return; }
-        self.members(chat.getRoomMembers());
+
+        var chatService = ChatServiceManager.sharedService();
+        self.members(chatService.getPCardsOrNamesForRoomOccupants(self.id()));
 
         var log = self._getRecentItems();
         ko.utils.arrayPushAll(self.log, log);

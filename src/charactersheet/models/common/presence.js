@@ -1,9 +1,7 @@
 import 'bin/knockout-mapping-autoignore';
 import 'knockout-mapping';
 import { CHAT_MESSAGE_TYPES } from 'charactersheet/services/common/account/messaging/chat_message_types';
-import { ChatServiceManager } from 'charactersheet/services/common/account/messaging/chat_service';
 import { PersistenceService } from 'charactersheet/services/common/persistence_service';
-import { SharedServiceManager } from 'charactersheet/services/common/shared_service_manager';
 import Strophe from 'strophe';
 import ko from 'knockout';
 
@@ -57,39 +55,6 @@ export function Presence() {
 
     self.fromBare = function() {
         return Strophe.getBareJidFromJid(self.from());
-    };
-
-    // Party/Room Methods
-
-    self.regardsCurrentParty = function() {
-        var chat = ChatServiceManager.sharedService();
-        return self.fromBare() === Strophe.getBareJidFromJid(chat.currentPartyNode);
-    };
-
-    self.regardsActiveRoom = function() {
-        var chat = ChatServiceManager.sharedService();
-
-        // We've joined a room, but there are no active rooms set yet.
-        if (chat.getAllRooms().length == 0) {
-            return true;
-        }
-        return chat.getAllRooms().some(function(jid, idx, _) {
-            return self.fromBare() === Strophe.getBareJidFromJid(jid);
-        });
-    };
-
-    self.regardsJoiningRoom = function() {
-        return self.regardsActiveRoom() && (
-            self.hasParticipantRole() || self.hasModeratorRole()
-        );
-    };
-
-    self.regardsLeavingRoom = function() {
-        return self.hasNoneRole();
-    };
-
-    self.regardsLeavingParty = function() {
-        return self.hasNoneRole() && self.regardsCurrentParty();
     };
 
     self.html = ko.pureComputed(function() {
