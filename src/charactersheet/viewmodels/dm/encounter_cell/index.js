@@ -14,6 +14,7 @@ export function EncounterCellViewModel(encounter) {
     self.name = encounter.name;
     self.encounterLocation = encounter.encounterLocation;
     self.isOpen = encounter.isOpen;
+    self.dragging = ko.observable(false);
 
     self._children = ko.observableArray(encounter.getChildren());
 

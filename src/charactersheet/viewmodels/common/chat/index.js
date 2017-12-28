@@ -30,7 +30,7 @@ export function ChatViewModel(params) {
 
     /* View Model Methods */
 
-    self.didLoad = function() {
+    self.didLoad = () => {
         self._purgeChats();
 
         self.reloadCells();
@@ -47,7 +47,7 @@ export function ChatViewModel(params) {
         Notifications.party.players.changed.add(self.reloadCells);
     };
 
-    self.didUnload = function() {
+    self.didUnload = () => {
 
         // Message Notifications
         Notifications.chat.message.remove(self._deliverMessageToRoom);
@@ -59,7 +59,7 @@ export function ChatViewModel(params) {
         Notifications.party.players.changed.remove(self.reloadCells);
     };
 
-    self.checkForParty = function() {
+    self.checkForParty = () => {
         var chat = ChatServiceManager.sharedService();
         self.isConnectedToParty(chat.currentPartyNode == null ? false : true);
     };
@@ -72,7 +72,7 @@ export function ChatViewModel(params) {
      * Note: New rooms are created with the following JID format:
      * <user's chosen room name>.<PARTY_ID>@<MUC_SERVICE>
      */
-    self.addItem = function(invitees) {
+    self.addItem = (invitees) => {
         var name = uuid.v4().substring(0,6);
         if (invitees.length === 0) { return; }
 
@@ -82,7 +82,7 @@ export function ChatViewModel(params) {
 
         self.reloadCells();
 
-        var cellToSelect = self.cells().filter(function(cell, idx, _) {
+        var cellToSelect = self.cells().filter((cell, idx, _) => {
             return cell.id() === room.chatId();
         })[0];
         self.selectedCell(cellToSelect);
@@ -91,7 +91,7 @@ export function ChatViewModel(params) {
     /**
      * Clear the detail view model and reload the list of chats.
      */
-    self.deleteCell = function(cell) {
+    self.deleteCell = (cell) => {
         var chatService = ChatServiceManager.sharedService();
         chatService.leave(cell.id(), 'test', console.log);
 
@@ -105,24 +105,24 @@ export function ChatViewModel(params) {
         self.selectedCell(self.cells()[0]);
     };
 
-    self.selectCell = function(cell) {
+    self.selectCell = (cell) => {
         var room = PersistenceService.findFirstBy(ChatRoom, 'chatId', cell.id());
         self.updateBadge(room);
     };
 
     /* Event Methods */
 
-    self.getDetailObject = function(cell) {
+    self.getDetailObject = (cell) => {
         return cell;
     };
 
-    self.modalFinishedOpening = function() {};
+    self.modalFinishedOpening = () => {};
 
     /**
      * Once a modal is closed, if it was closed by clicking done, then create
      * a new room and add the selected users to it.
      */
-    self.modalFinishedClosing = function(partyMembersToAdd) {
+    self.modalFinishedClosing = (partyMembersToAdd) => {
         self.modalIsOpen(false);
         if (partyMembersToAdd.length > 0) {
             self.addItem(partyMembersToAdd);
@@ -132,8 +132,8 @@ export function ChatViewModel(params) {
     /**
      * Update the value of the badge for a given room.
      */
-    self.updateBadge = function(room) {
-        var cellToBadge = self.cells().filter(function(cell, idx, _) {
+    self.updateBadge = (room) => {
+        var cellToBadge = self.cells().filter((cell, idx, _) => {
             return cell.id() === room.chatId();
         })[0];
         if (cellToBadge) {
@@ -147,7 +147,7 @@ export function ChatViewModel(params) {
      * Fetch all of the cells for the given character/campaign and
      * convert them into cells.
      */
-    self.reloadCells = function() {
+    self.reloadCells = () => {
         self.chats(self._getChats());
         self.cells(self._getChatCells());
     };
@@ -156,23 +156,23 @@ export function ChatViewModel(params) {
      * Tell each of the existing cells to reload their data.
      * This does NOT reload the list of cells from disk.
      */
-    self.refreshCells = function() {
-        return self.cells().forEach(function(cell, idx, _) {
+    self.refreshCells = () => {
+        return self.cells().forEach((cell, idx, _) => {
             cell.reload();
         });
     };
 
     /* Private Methods */
 
-    self._getChatCells = function() {
-        return self.chats().map(function(chat, idx, _) {
+    self._getChatCells = () => {
+        return self.chats().map((chat, idx, _) => {
             var cell = new ChatCellViewModel(chat);
             cell.reload();
             return cell;
         });
     };
 
-    self._getChats = function() {
+    self._getChats = () => {
         var key = CharacterManager.activeCharacter().key();
         var chatService = ChatServiceManager.sharedService();
         var currentPartyNode = chatService.currentPartyNode;
@@ -185,7 +185,7 @@ export function ChatViewModel(params) {
                 new KeyValuePredicate('partyId', currentPartyNode)
             ])
         ]);
-        return chats.sort(function(a,b) {
+        return chats.sort((a,b) => {
             var aVal = a.isParty() ? 1 : -1;
             var bVal = b.isParty() ? 1 : -1;
 
@@ -196,7 +196,7 @@ export function ChatViewModel(params) {
     /**
      * Return if the current active room is the same as the provided.
      */
-    self._isSelectedRoom = function(room) {
+    self._isSelectedRoom = (room) => {
         if (!room || !self.selectedCell()) { return false; }
         return self.selectedCell().id() === room.chatId();
     };
@@ -204,7 +204,7 @@ export function ChatViewModel(params) {
     /**
      * Tell the child view model that it should update its chat messages.
      */
-    self._childViewModelShouldUpdate = function() {
+    self._childViewModelShouldUpdate = () => {
         self.selectedObject.valueHasMutated();
     };
 
@@ -213,7 +213,7 @@ export function ChatViewModel(params) {
      * active, else badge the icon or create the room if needed and alert
      * the user.
      */
-    self._deliverMessageToRoom = function(room, msg, delay, hideTitle) {
+    self._deliverMessageToRoom = (room, msg, delay, hideTitle) => {
         self.reloadCells();
         var roomIsSelected = self._isSelectedRoom(room);
         if (roomIsSelected) {
@@ -235,34 +235,34 @@ export function ChatViewModel(params) {
         }
     };
 
-    self._userHasJoinedOrLeft = function(presence) {
+    self._userHasJoinedOrLeft = (presence) => {
         if (self._isMe(presence.fromUsername())) { return; }
         var room = PersistenceService.findFirstBy(ChatRoom, 'chatId', presence.fromBare());
         self._deliverMessageToRoom(room, presence, false, true);
     };
 
-    self._didJoinParty = function() {
+    self._didJoinParty = () => {
         self.reloadCells();
         self.selectedCell(self.cells()[0]);
         self.checkForParty();
     };
 
-    self._hasLeftParty = function() {
+    self._hasLeftParty = () => {
         self.reloadCells();
         self._purgeChats();
         self.checkForParty();
     };
 
-    self._isMe = function(nick) {
+    self._isMe = (nick) => {
         var xmpp = XMPPService.sharedService();
         return Strophe.getNodeFromJid(xmpp.connection.jid) === nick;
     };
 
-    self._purgeChats = function() {
+    self._purgeChats = () => {
         // Chat logs are saved server-side.
         var key = CharacterManager.activeCharacter().key();
         var chats = PersistenceService.findBy(ChatRoom, 'characterId', key);
-        chats.forEach(function(chat, idx, _) {
+        chats.forEach((chat, idx, _) => {
             chat.purge();
         });
     };
