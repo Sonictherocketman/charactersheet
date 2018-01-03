@@ -1,3 +1,4 @@
+import 'bin/knockout-circular-progress';
 import {
     DeathSave,
     Health,
@@ -11,6 +12,8 @@ import { Notifications } from 'charactersheet/utilities';
 import { PersistenceService } from 'charactersheet/services/common/persistence_service';
 import ko from 'knockout';
 import template from './index.html';
+import icon from 'images/nested-hearts.svg';
+
 
 export function StatsViewModel() {
     var self = this;
