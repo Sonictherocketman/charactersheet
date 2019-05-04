@@ -61,7 +61,7 @@ module.exports = merge(common, {
             /**
              * The connection URL for the XMPP service.
              */
-            'XMPP_WS_URL': JSON.stringify('wss://adventurerscodex.com/chat/'),
+            'XMPP_WS_URL': JSON.stringify('ws://localhost:5280/websocket'),
             /**
              * Date and time the build was created
              */
