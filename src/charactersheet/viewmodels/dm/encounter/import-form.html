@@ -1,0 +1,37 @@
+<form data-bind="submit: $component.submit">
+  <card-submit-actions params="{reset: $component.reset}"></card-submit-actions>
+  <!-- ko if: $component.addForm -->
+  <div class="h4 collapsable-card-title">
+    Import Encounter
+  </div>
+  <!-- /ko -->
+  <div class="row" data-bind="with: entity">
+    <div class="form-group col col-sm-12">
+      <label for="name" class="control-label">
+        Dungeon JSON File
+      </label>
+      <input
+        type="file"
+        class="form-control"
+        name="dataFile"
+        accept="application/json,.json"
+      />
+    </div>
+    <div class="form-group col col-sm-12">
+      <label for="name" class="control-label">
+        Dungeon Map Image File
+      </label>
+      <input
+        type="file"
+        class="form-control"
+        name="mapImageFile"
+        accept=".png,.jpg,.jpeg"
+      />
+    </div>
+    <form-submit-actions params="{
+      reset: $component.reset,
+      delete: $component.delete,
+      addForm: $component.addForm,
+    }"></form-submit-actions>
+  </div>
+</form>

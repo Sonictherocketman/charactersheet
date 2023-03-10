@@ -19,6 +19,8 @@ class EncounterViewModel extends AbstractEncounterListViewModel {
         this.flip = params.flip;
         this.active = ko.observable();
         this.forceCardResize = params.forceCardResize;
+
+        this.displayImportForm = ko.observable(false);
     }
 
     async load() {
@@ -40,6 +42,10 @@ class EncounterViewModel extends AbstractEncounterListViewModel {
         // Pop off the children components so that there's
         // no legacy, deleted views displayed.
         this.column.popToRoot();
+    }
+
+    toggleShowImportForm() {
+        this.displayImportForm(!this.displayImportForm());
     }
 }
 

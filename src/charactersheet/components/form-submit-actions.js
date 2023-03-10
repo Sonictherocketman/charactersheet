@@ -32,6 +32,7 @@ export class FormSubmitActionComponent {
         this.showDisclaimer = params.showDisclaimer;
         this.reset = params.reset;
         this.delete = params.delete;
+        this.submitTitle = params.submitTitle || 'Add';
     }
 
     clickReset = () => {
@@ -71,7 +72,7 @@ ko.components.register('form-submit-actions', {
           <button class="btn btn-sm btn-primary" type="submit">Save</button>\
           <!-- /ko -->\
           <!-- ko if: $component.addForm -->\
-          <button type="submit" class="btn btn-primary btn-sm">Add</button>\
+          <button type="submit" class="btn btn-primary btn-sm" data-bind="text: submitTitle"></button>\
           <!-- /ko -->\
         </div>\
       </div>\
