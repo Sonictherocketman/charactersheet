@@ -109,22 +109,22 @@ EncounterItem.validationConstraints = {
         weight: {
             required: true,
             type: 'number',
-            max: 10000,
-            min: -10000,
+            max: 100000000,
+            min: 0,
             step: 1,
         },
         quantity: {
             required: true,
             type: 'number',
-            max: 10000,
-            min: -10000,
+            max: 100000000,
+            min: 0,
             step: 1,
         },
         cost: {
             required: true,
             type: 'number',
-            max: 10000,
-            min: -10000,
+            max: 100000000,
+            min: 0,
             step: 1,
         },
         currencyDenomination: {

@@ -1,4 +1,4 @@
-import { Notifications, uploadFormData, Fixtures } from 'charactersheet/utilities';
+import { CoreManager, Notifications, uploadFormData, Fixtures } from 'charactersheet/utilities';
 import { AbstractChildFormModel } from 'charactersheet/viewmodels/abstract';
 import { Encounter, EncounterSection } from 'charactersheet/models/dm';
 
@@ -19,6 +19,9 @@ export class EncounterImportFormViewModel extends AbstractChildFormModel {
     barColor = ko.observable(Fixtures.general.colorHexList[0]);
     progress = ko.observable(0);
 
+    mapImageFile = ko.observable();
+    dataFile = ko.observable();
+
     modelClass() {
         return Encounter;
     }
@@ -26,15 +29,23 @@ export class EncounterImportFormViewModel extends AbstractChildFormModel {
     async save() {
         let success = true, error = null;
 
+        // The auto-camel-caser doesn't work on multi-part files. We need
+        // to use the actual snake-case for this.
         let formData = new FormData();
-        formData.append('dataFile', null);
-        formData.append('mapImageFile', null);
+        formData.append('data_file', this.dataFile());
+        formData.append('map_image_file', this.mapImageFile());
+
+        // Use the Hypnos schema to get the import API URL.
+        const coreUuid = CoreManager.activeCore().uuid();
+        const url = schema.content.core.encounters.fromDonjon.url.replace(
+            '{coreUuid}',
+            coreUuid,
+        );
 
         try {
             const encounter = await uploadFormData(
                 formData,
-                // Use the Hypnos schema to get the import API URL.
-                schema.content.core.encounters.fromDonjon.url,
+                url,
                 this.progress
             );
         } catch(e) {

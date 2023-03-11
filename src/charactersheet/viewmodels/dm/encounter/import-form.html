@@ -4,6 +4,14 @@
   <div class="h4 collapsable-card-title">
     Import Encounter
   </div>
+  <p class="text-muted">
+    <small>
+      Import a dungeon from
+      <a href="https://donjon.bin.sh/5e/dungeon/" title="donjon.bin.sh" target="_blank">
+        donjon.bin.sh</a>. Include the dungeon JSON file which can be downloaded
+      at the bottom of the page.
+    </small>
+  </p>
   <!-- /ko -->
   <div class="row" data-bind="with: entity">
     <div class="form-group col col-sm-12">
@@ -15,6 +23,8 @@
         class="form-control"
         name="dataFile"
         accept="application/json,.json"
+        required
+        data-bind="event: { change: () => $component.dataFile($element.files[0]) }"
       />
     </div>
     <div class="form-group col col-sm-12">
@@ -26,6 +36,8 @@
         class="form-control"
         name="mapImageFile"
         accept=".png,.jpg,.jpeg"
+        required
+        data-bind="event: { change: () => $component.mapImageFile($element.files[0]) }"
       />
     </div>
     <form-submit-actions params="{
