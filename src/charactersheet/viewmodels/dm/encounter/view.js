@@ -14,6 +14,7 @@ class EncounterViewModel extends AbstractEncounterListViewModel {
         autoBind(this);
 
         this.addFormId = '#add-encounter';
+        this.importFormId = '#import-donjon-encounter';
         this.collapseAllId = '#encounter-pane';
         this.column = params.column;
         this.flip = params.flip;
@@ -44,8 +45,20 @@ class EncounterViewModel extends AbstractEncounterListViewModel {
         this.column.popToRoot();
     }
 
+    toggleShowAddForm() {
+        super.toggleShowAddForm();
+        setTimeout(this.forceCardResize, DELAY.LONG);
+    }
+
     toggleShowImportForm() {
-        this.displayImportForm(!this.displayImportForm());
+        if (this.displayImportForm()) {
+            this.displayImportForm(false);
+            $(this.importFormId).collapse('hide');
+        } else {
+            this.displayImportForm(true);
+            $(this.importFormId).collapse('show');
+        }
+        setTimeout(this.forceCardResize, DELAY.LONG);
     }
 }
 

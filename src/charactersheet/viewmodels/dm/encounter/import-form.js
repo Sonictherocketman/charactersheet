@@ -1,6 +1,7 @@
 import { CoreManager, Notifications, uploadFormData, Fixtures } from 'charactersheet/utilities';
 import { AbstractChildFormModel } from 'charactersheet/viewmodels/abstract';
 import { Encounter, EncounterSection } from 'charactersheet/models/dm';
+import { UserServiceManager } from 'charactersheet/services';
 
 import autoBind from 'auto-bind';
 import ko from 'knockout';
@@ -18,12 +19,25 @@ export class EncounterImportFormViewModel extends AbstractChildFormModel {
 
     barColor = ko.observable(Fixtures.general.colorHexList[0]);
     progress = ko.observable(0);
+    isUploading = ko.observable(false);
+
+    isActivePatron = ko.observable(false);
+    imagesRemaining = ko.observable(0);
 
     mapImageFile = ko.observable();
     dataFile = ko.observable();
 
     modelClass() {
         return Encounter;
+    }
+
+    setUpSubscriptions() {
+        super.setUpSubscriptions();
+
+        this.subscriptions.push(
+            Notifications.user.exists.add(this.userDidChange)
+        );
+        this.userDidChange();
     }
 
     async save() {
@@ -33,7 +47,9 @@ export class EncounterImportFormViewModel extends AbstractChildFormModel {
         // to use the actual snake-case for this.
         let formData = new FormData();
         formData.append('data_file', this.dataFile());
-        formData.append('map_image_file', this.mapImageFile());
+        if (this.mapImageFile()) {
+            formData.append('map_image_file', this.mapImageFile());
+        }
 
         // Use the Hypnos schema to get the import API URL.
         const coreUuid = CoreManager.activeCore().uuid();
@@ -43,19 +59,19 @@ export class EncounterImportFormViewModel extends AbstractChildFormModel {
         );
 
         try {
-            const encounter = await uploadFormData(
+            this.isUploading(true);
+            const data = await uploadFormData(
                 formData,
                 url,
                 this.progress
             );
+            const encounter = new Encounter();
+            encounter.importValues(data);
+            Notifications.encounter.added.dispatch(encounter);
+            this.isUploading(false);
         } catch(e) {
             success = false, error = e;
         }
-
-        if (success) {
-            Notifications.encounter.added.dispatch(encounter);
-        }
-
         this.didSave(success, error);
     }
 
@@ -64,6 +80,16 @@ export class EncounterImportFormViewModel extends AbstractChildFormModel {
 
         if (this.forceCardResize) {
             this.forceCardResize();
+        }
+    }
+
+    // Events
+
+    userDidChange() {
+        const user = UserServiceManager.sharedService().user();
+        if (user) {
+            this.isActivePatron(user.isActivePatron);
+            this.imagesRemaining(user.remainingMediaUploads);
         }
     }
 }
