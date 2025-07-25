@@ -17,6 +17,7 @@ export class ShareViewModel extends AbstractTabularViewModel {
         autoBind(this);
         this.modalStatus = params.modalStatus || ko.observable(false);
         this.core = params.core;
+        this.setupClipboard();
     }
 
     closeModal() {
@@ -28,7 +29,6 @@ export class ShareViewModel extends AbstractTabularViewModel {
     }
 
     setupClipboard() {
-        // Clipboard initialization.
         const clipboard = new Clipboard('.copy', {
             container: document.getElementById('shareModal')
         });
