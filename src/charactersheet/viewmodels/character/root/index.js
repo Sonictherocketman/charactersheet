@@ -186,15 +186,41 @@ export function CharacterRootViewModel(params) {
         self.armorClassService.init();
 
         // Subscriptions
-        HotkeysService.registerHotkey('1', self.activateStatsTab);
-        HotkeysService.registerHotkey('2', self.activateSkillsTab);
-        HotkeysService.registerHotkey('3', self.activateSpellsTab);
-        HotkeysService.registerHotkey('4', self.activateEquipmentTab);
-        HotkeysService.registerHotkey('5', self.activateInventoryTab);
-        HotkeysService.registerHotkey('6', self.activateCompanionsTab);
-        HotkeysService.registerHotkey('7', self.activateNotesTab);
-        HotkeysService.registerHotkey('8', self.activatePartyTab);
-        HotkeysService.registerHotkey('9', self.activateExhibitTab);
+        HotkeysService.registerHotkey('1', () => self.activateTabByAllowedIndex(0));
+        HotkeysService.registerHotkey('2', () => self.activateTabByAllowedIndex(1));
+        HotkeysService.registerHotkey('3', () => self.activateTabByAllowedIndex(2));
+        HotkeysService.registerHotkey('4', () => self.activateTabByAllowedIndex(3));
+        HotkeysService.registerHotkey('5', () => self.activateTabByAllowedIndex(4));
+        HotkeysService.registerHotkey('6', () => self.activateTabByAllowedIndex(5));
+        HotkeysService.registerHotkey('7', () => self.activateTabByAllowedIndex(6));
+        HotkeysService.registerHotkey('8', () => self.activateTabByAllowedIndex(7));
+        HotkeysService.registerHotkey('9', () => self.activateTabByAllowedIndex(8));
+    };
+
+    self.activateTabByAllowedIndex = tabId => {
+        // Activate the tab, taking into account which tabs are actually visible.
+        const allTabs = PlayerTypes.character.visibleTabs;
+        const settingsKeys = Object.keys(self.activeCharacter().settings());
+        const visibleTabsAccordingToPlayerSettings = (
+            settingsKeys
+            // Keep only the active tabs
+            .filter(key => ko.unwrap(self.activeCharacter().settings()[key]))
+            // Map the setting name to the tab name. This will not preserve the
+            // ordering so we need to fix that later.
+            .map(key => key.toLowerCase())
+            .flatMap(key => (allTabs
+                .map(tabName => tabName.toLowerCase())
+                // Some active setting contains the tab name
+                .filter(tabName => key.indexOf(tabName) > -1)[0]
+            ))
+        );
+
+        // Filter the tabs by which ones are allowed and then activate that tab
+        const allowedTabs = allTabs.filter(tab => visibleTabsAccordingToPlayerSettings.indexOf(tab) > -1);
+        const tabIdToActivate = allowedTabs[tabId];
+        if (tabIdToActivate !== undefined) {
+            self._setActiveTab(tabIdToActivate);
+        }
     };
 
     self.unload = () => {

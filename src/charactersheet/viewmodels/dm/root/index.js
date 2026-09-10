@@ -107,6 +107,32 @@ export function DMRootViewModel() {
         return self.tabIsVisible('initiative');
     });
 
+    self.activateTabByAllowedIndex = tabId => {
+        // Activate the tab, taking into account which tabs are actually visible.
+        const allTabs = PlayerTypes.dm.visibleTabs;
+        const settingsKeys = Object.keys(self.activeCampaign().settings());
+        const visibleTabsAccordingToPlayerSettings = (
+            settingsKeys
+            // Keep only the active tabs
+            .filter(key => ko.unwrap(self.activeCampaign().settings()[key]))
+            // Map the setting name to the tab name. This will not preserve the
+            // ordering so we need to fix that later.
+            .map(key => key.toLowerCase())
+            .flatMap(key => (allTabs
+                .map(tabName => tabName.toLowerCase())
+                // Some active setting contains the tab name
+                .filter(tabName => key.indexOf(tabName) > -1)[0]
+            ))
+        );
+
+        // Filter the tabs by which ones are allowed and then activate that tab
+        const allowedTabs = allTabs.filter(tab => visibleTabsAccordingToPlayerSettings.indexOf(tab) > -1);
+        const tabIdToActivate = allowedTabs[tabId];
+        if (tabIdToActivate !== undefined) {
+            self._setActiveTab(tabIdToActivate);
+        }
+    };
+
     self.activateEncounterTab = () => {
         self._setActiveTab('encounter');
     };
@@ -159,13 +185,13 @@ export function DMRootViewModel() {
             $(`.nav-tabs a[href="#${self.activeTab()}"]`).tab('show');
         });
 
-        HotkeysService.registerHotkey('1', self.activateEncounterTab);
-        HotkeysService.registerHotkey('2', self.activateMapsTab);
-        HotkeysService.registerHotkey('3', self.activateDmScreenTab);
-        HotkeysService.registerHotkey('4', self.activateNotesTab);
-        HotkeysService.registerHotkey('5', self.activatePartyTab);
-        HotkeysService.registerHotkey('6', self.activateExhibitTab);
-        HotkeysService.registerHotkey('7', self.activateInitiativeTrackerTab);
+        HotkeysService.registerHotkey('1', () => self.activateTabByAllowedIndex(0));
+        HotkeysService.registerHotkey('2', () => self.activateTabByAllowedIndex(1));
+        HotkeysService.registerHotkey('3', () => self.activateTabByAllowedIndex(2));
+        HotkeysService.registerHotkey('4', () => self.activateTabByAllowedIndex(3));
+        HotkeysService.registerHotkey('5', () => self.activateTabByAllowedIndex(4));
+        HotkeysService.registerHotkey('6', () => self.activateTabByAllowedIndex(5));
+        HotkeysService.registerHotkey('7', () => self.activateTabByAllowedIndex(6));
 
         Notifications.dm.tabShouldChange.add(self._setActiveTab);
     };

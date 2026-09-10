@@ -33,7 +33,7 @@ export class SettingsViewModel extends ViewModel {
         showExhibitTab:"Exhibit",
         showEncounterTab: "Encounters",
         showMapsImagesTab: "Maps & Images",
-        showDmscreenTab: "DM Screen",
+        showDmscreenTab: "Screen",
         showInitiativeTab: "Initiative",
         showStatsTab: "Stats",
         showSkillsTab: "Skills",
@@ -48,7 +48,6 @@ export class SettingsViewModel extends ViewModel {
         "showEncounterTab",
         "showMapsImagesTab",
         "showDmscreenTab",
-        "showInitiativeTab",
         "showStatsTab",
         "showSkillsTab",
         "showSpellsTab",
@@ -58,6 +57,7 @@ export class SettingsViewModel extends ViewModel {
         "showNotesTab",
         "showPartyTab",
         "showExhibitTab",
+        "showInitiativeTab",
     ];
 
     getSettingName(setting) {
