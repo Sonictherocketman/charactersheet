@@ -121,7 +121,7 @@ export class CharacterPortraitViewModel {
 
         return `
           background-image:
-            linear-gradient(to bottom, transparent, white),
+            linear-gradient(to bottom, transparent, 80%, white),
             url('${this.party().campaign.headerImageUrl}');
           background-size: cover;
           background-position: center;
